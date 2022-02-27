@@ -7,7 +7,7 @@ import string
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 import pickle
-
+import os
 app = Flask(__name__)
 
 def remove_pattern(input_txt,pattern):
@@ -32,10 +32,10 @@ def home():
 def predict():
     if request.method == 'POST':
         message = request.form['message']
-        clean_test = remove_pattern(message,"@[\w]*")
-        tokenized_clean_test = clean_test.split()
-        stem_tokenized_clean_test = [stemmer.stem(i) for i in tokenized_clean_test]
-        message = ' '.join(stem_tokenized_clean_test)
+        #clean_test = remove_pattern(message,"@[\w]*")
+        #tokenized_clean_test = clean_test.split()
+        #stem_tokenized_clean_test = [stemmer.stem(i) for i in tokenized_clean_test]
+        #message = ' '.join(stem_tokenized_clean_test)
         data = [message]
         data = cv.transform(data)
         my_prediction = clf.predict(data)
@@ -43,12 +43,14 @@ def predict():
 
 
 if __name__ == '__main__':
-	
-	##initialize stemmer	
-	stemmer = PorterStemmer()
 
-	##load vectorizer and model
-	with open('model/logistic_clf.pkl', 'rb') as f:
-	    cv, clf = pickle.load(f)
-	
-	app.run(host='0.0.0.0',port=5000)
+    #port = os.environ("PORT")
+    port = int(os.environ.get('PORT', 5000))
+    ##initialize stemmer	
+    # stemmer = PorterStemmer()
+
+    ##load vectorizer and model
+    with open('model/logistic_clf.pkl', 'rb') as f:
+        cv, clf = pickle.load(f)
+
+    app.run(host='0.0.0.0',port=port)
